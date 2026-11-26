@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Result Details</title>
+
+    <style>
+        :root {
+            --bg-deep: #edf6ff;
+            --bg-mid: #dfeeff;
+            --panel: #ffffff;
+            --card: #ffffff;
+            --primary: #1f6feb;
+            --primary-dark: #124dbd;
+            --secondary: #5aa8ff;
+            --text: #12395f;
+            --text-soft: #3c5f8f;
+            --muted: #6f8bb0;
+            --line: rgba(31, 111, 235, 0.16);
+            --danger: #e25757;
+            --shadow: 0 20px 45px rgba(31, 111, 235, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px 16px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #f8fbff 0%, #edf5ff 36%, #dfeeff 100%);
+            color: var(--text);
+        }
+
+        .result-container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 30px 28px 26px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 8px 0 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .page-header h1 {
+            margin: 0 0 10px;
+            color: var(--text);
+            font-size: clamp(1.9rem, 3vw, 2.8rem);
+        }
+
+        .page-header p {
+            margin: 0;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(31, 111, 235, 0.08);
+            color: var(--primary-dark);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: 0.74rem;
+        }
+
+        #resultArea {
+            margin-top: 22px;
+        }
+
+        .student-details {
+            padding: 20px 18px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: #f9fbff;
+        }
+
+        .student-details h2,
+        .table-heading {
+            margin: 0 0 14px;
+            color: var(--text);
+            font-size: 1.25rem;
+        }
+
+        .student-details p {
+            padding: 10px 0;
+            margin: 0;
+            border-bottom: 1px solid var(--line);
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+
+        .student-details p:last-child {
+            border-bottom: none;
+        }
+
+        .student-details strong {
+            color: var(--text);
+        }
+
+        .table-heading {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: center;
+        }
+
+        th {
+            background: linear-gradient(180deg, #edf5ff, #dfeeff);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        td {
+            color: var(--text-soft);
+            background: #ffffff;
+        }
+
+        .average-row {
+            background: rgba(31, 111, 235, 0.09);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .overall {
+            margin-top: 20px;
+            padding: 16px 18px;
+            border-left: 5px solid var(--primary);
+            border-radius: 12px;
+            background: rgba(31, 111, 235, 0.08);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .navigation {
+            display: inline-block;
+            width: fit-content;
+            margin: 24px auto 0;
+            padding: 12px 22px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 12px 20px rgba(31, 111, 235, 0.18);
+        }
+
+        .navigation:hover {
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            padding: 22px 16px;
+            border-radius: 14px;
+            background: rgba(226, 87, 87, 0.08);
+            border: 1px solid rgba(226, 87, 87, 0.2);
+            color: var(--danger);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        @media (max-width: 560px) {
+            .result-container {
+                padding: 20px 16px 18px;
+                border-radius: 16px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                min-width: 110px;
+                font-size: 0.83rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="result-container">
+
+    <header class="page-header">
+        <h1>Student Results</h1>
+        <p>Nashath Hamtha-0102</p>
+    </header>
+
+    <main id="resultArea"></main>
+
+    <a href="Index.html" class="navigation">
+        Back to Calculator
+    </a>
+
+</div>
+
+<script>
+
+    // Get the saved student information
+    const resultData = sessionStorage.getItem("studentResults");
+
+    const displayArea = document.getElementById("resultArea");
+
+
+    // Show a message if there are no saved results
+    if (resultData === null) {
+
+        displayArea.innerHTML = `
+            <div class="error-message">
+                No student results available.
+                Please return to the calculator and submit the marks.
+            </div>
+        `;
+
+    } else {
+
+        const studentInfo = JSON.parse(resultData);
+
+
+        // Create student details section
+        const detailsBox = document.createElement("section");
+
+        detailsBox.className = "student-details";
+
+        detailsBox.innerHTML = `
+            <h2>Student Information</h2>
+
+            <p><strong>Student Name:</strong> ${escapeText(studentInfo.name)}</p>
+
+            <p><strong>Gender:</strong> ${escapeText(studentInfo.gender)}</p>
+
+            <p><strong>Course(s):</strong> ${studentInfo.courses.map(escapeText).join(", ")}</p>
+        `;
+
+        displayArea.appendChild(detailsBox);
+
+
+        // Create subject results table
+        const title = document.createElement("h2");
+
+        title.className = "table-heading";
+        title.textContent = "Subject Results";
+
+        displayArea.appendChild(title);
+
+
+        const resultTable = document.createElement("table");
+
+        const headings = ["Subject", "Marks", "Grade"];
+
+        const header = resultTable.createTHead();
+        const headingRow = header.insertRow();
+
+        headings.forEach(text => {
+
+            const cell = document.createElement("th");
+
+            cell.textContent = text;
+
+            headingRow.appendChild(cell);
+
+        });
+
+
+        const body = resultTable.createTBody();
+
+        studentInfo.subjects.forEach((subject, index) => {
+
+            const row = body.insertRow();
+
+            const values = [
+                subject,
+                studentInfo.marks[index],
+                studentInfo.grades[index]
+            ];
+
+            values.forEach(value => {
+
+                const cell = row.insertCell();
+
+                cell.textContent = value;
+
+            });
+
+        });
+
+
+        // Add average marks to the table
+        const averageRow = body.insertRow();
+
+        averageRow.className = "average-row";
+
+        const averageLabel = averageRow.insertCell();
+
+        averageLabel.colSpan = 2;
+        averageLabel.textContent = "Average Marks";
+
+        const averageValue = averageRow.insertCell();
+
+        averageValue.textContent = studentInfo.average;
+
+
+        displayArea.appendChild(resultTable);
+
+
+        // Display the overall grade
+        const overallBox = document.createElement("div");
+
+        overallBox.className = "overall";
+
+        overallBox.textContent =
+            "Overall Grade: " + studentInfo.overallGrade;
+
+        displayArea.appendChild(overallBox);
+
+    }
+
+
+    // Safely display student-entered text
+    function escapeText(value) {
+
+        const element = document.createElement("span");
+
+        element.textContent = String(value);
+
+        return element.innerHTML;
+    }
+
+</script>
+
+</body>
+</html>

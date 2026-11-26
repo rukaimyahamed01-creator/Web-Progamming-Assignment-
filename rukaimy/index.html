@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Marks & Grade Calculator</title>
+
+    <style>
+        :root {
+            --primary: #a99cff;
+            --primary-dark: #c1b6ff;
+            --primary-button-end: #6652d8;
+            --secondary: #70d7de;
+            --text: #f0efff;
+            --text-soft: #c1c3dc;
+            --muted: #9c9fba;
+            --line: rgba(255, 255, 255, 0.13);
+            --danger: #ff91aa;
+            --glass: rgba(27, 29, 55, 0.76);
+            --shadow: 0 24px 70px rgba(4, 5, 20, 0.42);
+            --page-bg:
+                radial-gradient(ellipse at 18% 22%, rgba(17, 119, 130, 0.34), transparent 31rem),
+                radial-gradient(ellipse at 82% 76%, rgba(57, 91, 174, 0.3), transparent 32rem),
+                linear-gradient(135deg, #07151b 0%, #0b1725 48%, #101528 100%);
+            --divider: rgba(255, 255, 255, 0.13);
+            --badge-bg: rgba(169, 156, 255, 0.14);
+            --badge-border: rgba(169, 156, 255, 0.2);
+            --section-bg: rgba(255, 255, 255, 0.045);
+            --section-border: rgba(255, 255, 255, 0.11);
+            --field-bg: rgba(12, 14, 33, 0.44);
+            --field-active-bg: rgba(12, 14, 33, 0.72);
+            --field-border: rgba(255, 255, 255, 0.14);
+            --choice-bg: rgba(255, 255, 255, 0.055);
+            --choice-hover-bg: rgba(255, 255, 255, 0.11);
+            --table-bg: rgba(255, 255, 255, 0.035);
+            --table-border: rgba(255, 255, 255, 0.12);
+            --table-line: rgba(255, 255, 255, 0.1);
+            --table-head-bg: rgba(169, 156, 255, 0.12);
+            --table-cell-bg: rgba(255, 255, 255, 0.025);
+            --average-bg: rgba(112, 215, 222, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            position: relative;
+            isolation: isolate;
+            min-height: 100vh;
+            padding: 32px 16px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--page-bg);
+            background-size: 160% 160%, 160% 160%, 200% 200%;
+            background-position: 0% 0%, 100% 100%, 0% 50%;
+            animation: background-drift 24s ease-in-out infinite alternate;
+            color: var(--text);
+            overflow-x: hidden;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+
+        @keyframes background-drift {
+            from {
+                background-position: 0% 0%, 100% 100%, 0% 50%;
+            }
+
+            to {
+                background-position: 100% 100%, 0% 0%, 100% 50%;
+            }
+        }
+
+        .ambient-background {
+            position: fixed;
+            z-index: 0;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .aurora-ribbon {
+            position: absolute;
+            left: -20%;
+            width: 140%;
+            height: 28vh;
+            min-height: 190px;
+            border-radius: 50%;
+            filter: blur(34px);
+            opacity: 0.27;
+            mix-blend-mode: screen;
+            will-change: transform;
+        }
+
+        .aurora-one {
+            top: 3%;
+            background: linear-gradient(90deg, transparent 4%, rgba(36, 206, 177, 0.06) 24%, rgba(36, 206, 177, 0.7) 48%, rgba(69, 131, 244, 0.55) 67%, transparent 96%);
+            animation: aurora-flow-one 25s ease-in-out infinite alternate;
+        }
+
+        .aurora-two {
+            top: 34%;
+            height: 34vh;
+            background: linear-gradient(90deg, transparent 7%, rgba(54, 118, 228, 0.06) 26%, rgba(54, 118, 228, 0.62) 52%, rgba(57, 207, 183, 0.48) 74%, transparent 96%);
+            animation: aurora-flow-two 32s ease-in-out infinite alternate;
+        }
+
+        .aurora-three {
+            bottom: -2%;
+            height: 30vh;
+            background: linear-gradient(90deg, transparent 3%, rgba(32, 178, 159, 0.04) 20%, rgba(32, 178, 159, 0.52) 46%, rgba(89, 107, 228, 0.58) 70%, transparent 98%);
+            animation: aurora-flow-three 29s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora-flow-one {
+            from { transform: translate3d(-5%, -8%, 0) rotate(-11deg) scaleY(0.8); }
+            to { transform: translate3d(7%, 14%, 0) rotate(8deg) scaleY(1.25); }
+        }
+
+        @keyframes aurora-flow-two {
+            from { transform: translate3d(6%, 8%, 0) rotate(10deg) scaleY(1.15); }
+            to { transform: translate3d(-8%, -12%, 0) rotate(-7deg) scaleY(0.78); }
+        }
+
+        @keyframes aurora-flow-three {
+            from { transform: translate3d(-4%, 9%, 0) rotate(7deg) scaleY(0.85); }
+            to { transform: translate3d(8%, -10%, 0) rotate(-10deg) scaleY(1.2); }
+        }
+
+        .calculator {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 34px;
+            background: var(--glass);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+                background-position: 50% 50%, 50% 50%, 50% 50%;
+            }
+
+            .aurora-ribbon {
+                animation: none;
+            }
+        }
+
+        .heading {
+            text-align: center;
+            padding: 4px 0 24px;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .heading h1 {
+            margin: 0 0 10px;
+            color: var(--text);
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            letter-spacing: -0.035em;
+        }
+
+        .heading p {
+            margin: 0;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            color: var(--primary-dark);
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            font-size: 0.74rem;
+        }
+
+        .form-section {
+            margin-top: 24px;
+            padding: 18px;
+            border: 1px solid var(--section-border);
+            border-radius: 18px;
+            background: var(--section-bg);
+        }
+
+        .form-section > label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+
+        .form-section input[type="text"],
+        .form-section input[type="number"] {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid var(--field-border);
+            border-radius: 13px;
+            background: var(--field-bg);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .form-section input::placeholder {
+            color: var(--muted);
+        }
+
+        .form-section input:focus {
+            border-color: var(--primary);
+            background: var(--field-active-bg);
+            box-shadow: 0 0 0 4px rgba(119, 101, 245, 0.11);
+        }
+
+        .selection {
+            display: flex;
+            gap: 12px 18px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .selection label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: var(--choice-bg);
+            border: 1px solid var(--field-border);
+            color: var(--text-soft);
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .selection label:hover {
+            transform: translateY(-1px);
+            border-color: rgba(119, 101, 245, 0.38);
+            background: var(--choice-hover-bg);
+        }
+
+        .selection input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 26px;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: var(--table-bg);
+            border: 1px solid var(--table-border);
+            box-shadow: 0 12px 28px rgba(75, 83, 145, 0.07);
+        }
+
+        th, td {
+            padding: 14px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--table-line);
+        }
+
+        th {
+            background: var(--table-head-bg);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        tbody tr:last-child th,
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td {
+            color: var(--text-soft);
+            background: var(--table-cell-bg);
+        }
+
+        td input {
+            width: 100%;
+            max-width: 110px;
+            margin: 0 auto;
+            padding: 9px 8px;
+            border: 1px solid var(--field-border);
+            border-radius: 10px;
+            text-align: center;
+            background: var(--field-bg);
+            color: var(--text);
+            outline: none;
+        }
+
+        td input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(119, 101, 245, 0.1);
+        }
+
+        .grade {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .average-row th {
+            background: var(--average-bg);
+            color: var(--text);
+            font-size: 0.96rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .actions button {
+            flex: 1;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 0.98rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 12px 24px rgba(89, 71, 220, 0.16);
+        }
+
+        .actions button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 28px rgba(89, 71, 220, 0.22);
+        }
+
+        .actions button:active {
+            transform: translateY(0);
+        }
+
+        .actions #calculate {
+            background: linear-gradient(135deg, #8878fa, var(--primary-button-end));
+        }
+
+        .actions .submit-btn {
+            background: linear-gradient(135deg, #65cad2, #3da2b2);
+        }
+
+        .message {
+            min-height: 22px;
+            margin-top: 18px;
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        @media (max-width: 560px) {
+            .calculator {
+                padding: 20px 16px 18px;
+                border-radius: 16px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                min-width: 100px;
+                font-size: 0.82rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="ambient-background" aria-hidden="true">
+    <span class="aurora-ribbon aurora-one"></span>
+    <span class="aurora-ribbon aurora-two"></span>
+    <span class="aurora-ribbon aurora-three"></span>
+</div>
+
+<div class="calculator">
+
+    <header class="heading">
+        <h1>Student Marks & Grade Calculator</h1>
+        <p>J.Rukaimy Ahamed-0046</p>
+    </header>
+
+    <form id="resultForm">
+
+        <div class="form-section">
+            <label for="name">Student Name:</label>
+            <input type="text" id="name"
+                   placeholder="Enter student name">
+        </div>
+
+        <div class="form-section">
+            <label>Gender:</label>
+
+            <div class="selection">
+                <label>
+                    <input type="radio" name="gender" value="Male">
+                    Male
+                </label>
+
+                <label>
+                    <input type="radio" name="gender" value="Female">
+                    Female
+                </label>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label>Choose Course(s):</label>
+
+            <div class="selection">
+                <label>
+                    <input type="checkbox" name="course" value="HNDIT">
+                    HNDIT
+                </label>
+
+                <label>
+                    <input type="checkbox" name="course" value="HNDE">
+                    HNDE
+                </label>
+
+                <label>
+                    <input type="checkbox" name="course" value="HNDA">
+                    HNDA
+                </label>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Marks (0-100)</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Machine Learning</td>
+                    <td>
+                        <input type="number" class="marks"
+                               min="0" max="100"
+                               step="1" placeholder="Marks">
+                    </td>
+                    <td class="grade">-</td>
+                </tr>
+
+                <tr>
+                    <td>Computer Network</td>
+                    <td>
+                        <input type="number" class="marks"
+                               min="0" max="100"
+                               step="1" placeholder="Marks">
+                    </td>
+                    <td class="grade">-</td>
+                </tr>
+
+                <tr>
+                    <td>Architecture</td>
+                    <td>
+                        <input type="number" class="marks"
+                               min="0" max="100"
+                               step="1" placeholder="Marks">
+                    </td>
+                    <td class="grade">-</td>
+                </tr>
+
+                <tr class="average-row">
+                    <th colspan="2">Average Marks</th>
+                    <th id="average">-</th>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="error" class="message"></div>
+
+        <div class="actions">
+            <button type="button" id="calculate">
+                Calculate
+            </button>
+
+            <button type="button" id="submit" class="submit-btn">
+                Submit
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+    // Subject information
+    const subjects = [
+        "Machine Learning",
+        "Computer Network",
+        "Architecture"
+    ];
+
+    const markInputs = document.querySelectorAll(".marks");
+    const gradeCells = document.querySelectorAll(".grade");
+
+
+    // Grade checking method
+    function getGrade(mark) {
+
+        if (mark >= 75) {
+            return "A";
+        }
+
+        if (mark >= 60) {
+            return "B";
+        }
+
+        if (mark >= 40) {
+            return "C";
+        }
+
+        return "D";
+    }
+
+
+    // Collect student information
+    function getStudentDetails() {
+
+        const name = document.getElementById("name").value.trim();
+
+        const gender = document.querySelector(
+            'input[name="gender"]:checked'
+        );
+
+        const courses = Array.from(
+            document.querySelectorAll(
+                'input[name="course"]:checked'
+            )
+        ).map(item => item.value);
+
+        if (name === "") {
+            throw new Error("Please enter the student name.");
+        }
+
+        if (!gender) {
+            throw new Error("Please select the gender.");
+        }
+
+        if (courses.length === 0) {
+            throw new Error("Please select at least one course.");
+        }
+
+        const marks = [];
+
+        markInputs.forEach(input => {
+
+            const value = input.value;
+            const mark = Number(value);
+
+            if (
+                value === "" ||
+                !Number.isInteger(mark) ||
+                mark < 0 ||
+                mark > 100
+            ) {
+                throw new Error(
+                    "Please enter whole-number marks between 0 and 100."
+                );
+            }
+
+            marks.push(mark);
+
+        });
+
+        return {
+            name: name,
+            gender: gender.value,
+            courses: courses,
+            marks: marks
+        };
+    }
+
+
+    // Calculate marks and grades
+    function calculateResults() {
+
+        const errorBox = document.getElementById("error");
+
+        errorBox.textContent = "";
+
+        try {
+
+            const student = getStudentDetails();
+
+            let total = 0;
+            const grades = [];
+
+            student.marks.forEach((mark, index) => {
+
+                total = total + mark;
+
+                const grade = getGrade(mark);
+
+                grades.push(grade);
+
+                gradeCells[index].textContent = grade;
+
+            });
+
+            const average = total / student.marks.length;
+
+            const roundedAverage = Number(average.toFixed(2));
+
+            document.getElementById("average").textContent =
+                roundedAverage;
+
+            student.subjects = subjects;
+            student.grades = grades;
+            student.average = roundedAverage;
+            student.overallGrade = getGrade(average);
+
+            return student;
+
+        } catch (error) {
+
+            errorBox.textContent = error.message;
+
+            gradeCells.forEach(cell => {
+                cell.textContent = "-";
+            });
+
+            document.getElementById("average").textContent = "-";
+
+            return null;
+        }
+    }
+
+
+    // Save student results
+    function submitResults() {
+
+        const studentData = calculateResults();
+
+        if (studentData === null) {
+            return;
+        }
+
+        sessionStorage.setItem(
+            "studentResults",
+            JSON.stringify(studentData)
+        );
+
+        window.location.href = "result.html";
+
+    }
+
+
+    // Button events
+    document.getElementById("calculate")
+        .addEventListener("click", calculateResults);
+
+    document.getElementById("submit")
+        .addEventListener("click", submitResults);
+
+</script>
+
+</body>
+</html>
+ 
